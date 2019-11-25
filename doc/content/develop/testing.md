@@ -1,7 +1,7 @@
 # CTest Regression Dashboard
 
 A number of systems have been configured for nightly testing and continuous integration.
-To view the results of these runs navigate your web browser to [http://cdash.hpcvis.com/index.php?project=SENSEI]().
+To view the results of these runs navigate your web browser to [https://cdash.nersc.gov/index.php?project=SENSEI]().
 
 # Running the tests
 

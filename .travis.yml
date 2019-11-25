@@ -1,0 +1,15 @@
+launguage: cpp
+os: osx
+addons:
+  homebrew:
+    packages:
+    - openmpi
+    - vtk
+    - swig
+    - cmake
+    - make
+install:
+  - pip3 install mpi4py
+script:
+  - git reset --hard ${TRAVIS_PULL_REQUEST_SHA}
+  - ${TRAVIS_BUILD_DIR}/ci_scripts/ci/travis/run.sh

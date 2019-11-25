@@ -1,0 +1,40 @@
+defaults: &defaults
+  working_directory: /home/sensei/sensei_insitu/software/sensei
+  steps:
+    - checkout:
+        path: /home/sensei/sensei_insitu/software/sensei/source
+    - run:
+        name: Update
+        command: bash source/ci_scripts/ci/circle/run.sh update
+    - run:
+        name: Configure
+        command: bash source/ci_scripts/ci/circle/run.sh configure
+    - run:
+        name: Build
+        command: bash source/ci_scripts/ci/circle/run.sh build
+    - run:
+        name: Test
+        command: |
+          ulimit -c unlimited
+          bash source/ci_scripts/ci/circle/run.sh test
+    - run:
+        command: |
+          mkdir -p /tmp/core_dumps
+          find . -name '*core*' | xargs bash -c 'for F in $@; do if file -b "$F" | grep -q "core file"; then cp -v --parents "$F" /tmp/core_dumps; fi; done'
+        when: on_fail
+    - store_artifacts:
+        path: /tmp/core_dumps
+
+version: 2
+
+jobs:
+  "ubuntu18.04-catalyst":
+    <<: *defaults
+    docker:
+      - image: scottwittenburg/pv-v5.7.0-for-sensei
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "ubuntu18.04-catalyst"

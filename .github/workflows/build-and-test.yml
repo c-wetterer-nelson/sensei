@@ -1,0 +1,31 @@
+name: GitHub Actions
+
+on: pull_request
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    env:
+      GH_YML_JOBNAME: ${{ matrix.jobname }}
+      GH_YML_OS: macOS
+
+    strategy:
+      fail-fast: false
+      matrix:
+        jobname: [
+          macos-vtk ]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Setup
+      run: ci_scripts/ci/gh-actions/macos-setup.sh
+    - name: Update
+      run: ci_scripts/ci/gh-actions/run.sh update
+    - name: Configure
+      run: ci_scripts/ci/gh-actions/run.sh configure
+    - name: Build
+      run: ci_scripts/ci/gh-actions/run.sh build
+    - name: Test
+      run: ci_scripts/ci/gh-actions/run.sh test

@@ -1,0 +1,11 @@
+#%Module 1.0
+
+conflict vtk
+conflict visit
+conflict sensei
+
+module load paraview/5.7.0
+
+prepend-path LD_LIBRARY_PATH /home/sensei/sensei_insitu/software/sensei/build_ubuntu18.04-catalyst/lib
+prepend-path PYTHONPATH /home/sensei/sensei_insitu/software/sensei/build_ubuntu18.04-catalyst/lib
+prepend-path PATH /home/sensei/sensei_insitu/software/sensei/build_ubuntu18.04-catalyst/bin

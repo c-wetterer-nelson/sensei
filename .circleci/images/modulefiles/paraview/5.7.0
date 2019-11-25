@@ -1,0 +1,12 @@
+#%Module 1.0
+
+# loading mesa causes the ParaView client to
+# fail in rendering with an "unsupported number of textures."
+# module load mesa/18.1.7
+
+prepend-path LD_LIBRARY_PATH /home/sensei/sensei_insitu/software/paraview/5.7.0/lib
+
+prepend-path PYTHONPATH /home/sensei/sensei_insitu/software/paraview/5.7.0/lib/python3.6
+prepend-path PYTHONPATH /home/sensei/sensei_insitu/software/paraview/5.7.0/lib/python3.6/site-packages/
+
+prepend-path PATH /home/sensei/sensei_insitu/software/paraview/5.7.0/bin
