@@ -1,47 +1,12 @@
 #!/bin/bash
 
-# FIXME: transition
+# FIXME: After moving target of PR to kitware/sensei on github, change to:
+#     API_BASE="https://api.github.com/repos/kitware/sensei"
 API_BASE="https://api.github.com/repos/scottwittenburg/sensei"
-COMMIT=${CIRCLE_SHA1}
-CDASH_STATUS_CONTEXT="cdash"
 PYTHON_EXECUTABLE=python3
 
-###
-### The following methods are used to post a status check into the PR which
-### provides a link to a CDash page containing all latest build results for
-### the PR (whether on Travis, CircleCI, or GitHub Actions)
-###
-### build_status_body: generates a link which queries CDash for build results
-### based on the commit SHA
-###
-### check_and_post_status: determines whether the status check has already
-### been updated, and if not, makes a POST request to GitHub api to create
-### the "CDash" link in the PR status checks.
-###
-
-build_status_body() {
-  cat <<EOF
-{
-  "state": "success",
-  "target_url": "https://cdash.nersc.gov/index.php?compare1=61&filtercount=1&field1=revision&project=sensei&showfilters=0&limit=100&value1=${COMMIT}&showfeed=0",
-  "description": "Build and test results available on CDash",
-  "context": "${CDASH_STATUS_CONTEXT}"
-}
-EOF
-}
-
-check_and_post_status() {
-  PYTHON_SCRIPT="${SOURCE_DIR}/ci_scripts/ci/circle/findStatus.py"
-  curl -u "${STATUS_ROBOT_NAME}:${STATUS_ROBOT_KEY}" "${API_BASE}/commits/${COMMIT}/statuses" | ${PYTHON_EXECUTABLE} ${PYTHON_SCRIPT} --context ${CDASH_STATUS_CONTEXT}
-  if [ $? -ne 0 ]
-  then
-    echo "Need to post a status for context ${CDASH_STATUS_CONTEXT}"
-    postBody="$(build_status_body)"
-    postUrl="${API_BASE}/statuses/${COMMIT}"
-    curl -u "${STATUS_ROBOT_NAME}:${STATUS_ROBOT_KEY}" "${postUrl}" -H "Content-Type: application/json" -H "Accept: application/vnd.github.v3+json" -d "${postBody}"
-  fi
-}
-
+# Whether this is a PR from a fork or the main repo, we need to figure out the
+# real branch name and pr number.
 get_real_branch_name() {
   REALBRANCH="${CIRCLE_BRANCH}"
   if [ -n "${CIRCLE_PR_NUMBER}" ]
@@ -96,18 +61,6 @@ fi
 case "$1" in
   update|configure|build|test)
     STEP=$1
-    if [ "$STEP" == "update" ]
-    then
-      ### The call below (as well as the "build_status_body" and
-      ### "check_and_post_status" methods) can be removed once CDash has
-      ### released version 3 and NERSC has updated it's CDash instance to that
-      ### version.  See the blog post below for information on how to make the
-      ### change:
-      ###
-      ###     https://blog.kitware.com/github-checks-and-statuses-from-cdash
-      ###
-      check_and_post_status
-    fi
     ;;
   *)
     echo "Usage: $0 (update|configure|build|test)"
